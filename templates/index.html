@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Recorder</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+        .left-div {
+            background-color: white;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .right-div {
+            background-color: black;
+            width: 50%;
+        }
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #stopBtn {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-div">
+        <button id="intro">_step1_ Start Chat</button>
+        <button id="startBtn">_step2_ Start Recording</button>
+        <button id="stopBtn" disabled>_step3_ Stop Recording</button>
+    </div>
+    <div class="right-div"></div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+
+        document.getElementById('intro').onclick = () => {
+            const audio = new Audio('/static/intro.wav');
+            audio.play().catch(error => {
+                console.error('Error playing intro audio:', error);
+            });
+        };
+
+        document.getElementById('startBtn').onclick = () => {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                    }
+                    audioChunks = [];  // Clear the previous audio chunks
+
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const formData = new FormData();
+                        formData.append('file', audioBlob, 'recording.wav');
+
+                        fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.output) {
+                                // Add a timestamp to avoid caching issues
+                                const timestamp = new Date().getTime();
+                                const audio = new Audio(`${data.output}?t=${timestamp}`);
+                                audio.play().catch(error => {
+                                    console.error('Error playing output audio:', error);
+                                });
+                            } else if (data.error) {
+                                console.error('Error:', data.error);
+                            }
+                        });
+                    };
+                    mediaRecorder.start();
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                });
+        };
+
+        document.getElementById('stopBtn').onclick = () => {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+            }
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        };
+    </script>
+</body>
+</html>
