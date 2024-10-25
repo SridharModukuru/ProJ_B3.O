@@ -1,16 +1,17 @@
 from flask import Flask, render_template, request, jsonify
-from pipeline import run_pipeline
+# from pipeline import run_pipeline
 from flask_cors import CORS
 import os
+import asyncio
 
 from components.transcription import transcribe_audio
-from components.responce_gen import generate_response
+from components.respo_gen import generate_response
 from components.tts import text_to_speech
 
 chat_history = [
-    {"role": "system", "content": """ You are a English Communication voice chatbot called peter. 
+    {"role": "system", "content": """ You are an English Communication voice chatbot called Peter. 
         You have to reply short and sweet. """},
-    {"role":"assistant","content":"Hello, I am peter. I'll help you learning english. what shall we start with , is there any topic that you wanna talk or learn about?"}
+    {"role":"assistant", "content":"Hello, I am Peter. I'll help you learn English. What shall we start with? Is there any topic you'd like to talk or learn about?"}
 ]
 
 app = Flask(__name__)
@@ -27,33 +28,42 @@ def index():
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
-def upload_file():
+async def upload_file():
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part'})
+        return jsonify({'error': 'No file part'}), 400
 
     file = request.files['file']
     if file.filename == '':
-        return jsonify({'error': 'No selected file'})
+        return jsonify({'error': 'No selected file'}), 400
 
     filepath = os.path.join(UPLOAD_FOLDER, 'recording.wav')
     file.save(filepath)
 
-    # Run the pipeline and check if it was successful
-    user_input = transcribe_audio('fa514b70902b8a222eadfacf4920d2e0252be990',r'C:\Users\Sridhar\_EMPTY FOLDERS\ProJ_B3.O\uploads\recording.wav')
-    # create div on right part with color blue and right align it and display user_input in it
+    # Transcribe the audio asynchronously
+    user_input = await asyncio.to_thread(transcribe_audio, 'ddbf32fde2fa328ab0f486c251de09ce1492be6d', filepath)
+
+    if not user_input.strip():  # Check if transcription is empty
+        return jsonify({'error': 'No voice detected'}), 400
+
+    print(user_input)
     chat_history.append({"role": "user", "content": user_input})
-    responce_text = generate_response('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',chat_history)
-    chat_history.append({"role": "assistant", "content": responce_text})
-    # create div on right part with color grey and left align it and display responce_text
-
-    success = run_pipeline(responce_text)
 
 
-    if success:
-        # Ensure the output file is always available
-        return jsonify({'message': 'File successfully processed', 'output': '/static/output.wav'})
-    else:
-        return jsonify({'error': 'Processing failed'})
+    response_text = await asyncio.to_thread(generate_response, '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', chat_history)
+    print(response_text)
+
+
+    output_file = os.path.join('static', 'output.wav')
+    await text_to_speech('fa514b70902b8a222eadfacf4920d2e0252be990', response_text, output_file)
+
+    chat_history.append({"role": "assistant", "content": response_text})
+
+    # Return the transcription and the audio URL
+    return jsonify({
+        'message': user_input,
+        'response': response_text,
+        'audio_url': f'/static/output.wav'
+    }), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

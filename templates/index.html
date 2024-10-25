@@ -14,7 +14,7 @@
             overflow: hidden;
         }
         .left-div {
-            background-color: white;
+            background-color: #f0f0f0;
             width: 50%;
             display: flex;
             flex-direction: column;
@@ -26,6 +26,13 @@
         .right-div {
             background-color: black;
             width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
         }
         button {
             font-size: 1.2em;
@@ -36,6 +43,51 @@
         #stopBtn {
             margin-top: 20px;
         }
+        .user-message {
+            text-align: right;
+            margin-bottom: 10px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+            color: black;
+            max-width: 80%;
+            margin-left: auto;
+        }
+        .bot-message {
+            text-align: left;
+            margin-bottom: 10px;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        /* Loading dots animation */
+        .loading-dots {
+            display: none;
+            align-self: flex-end;
+            margin-top: 10px;
+            color: white;
+        }
+        .loading-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 0.6s infinite alternate;
+        }
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes bounce {
+            to {
+                transform: translateY(-10px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -44,7 +96,11 @@
         <button id="startBtn">_step2_ Start Recording</button>
         <button id="stopBtn" disabled>_step3_ Stop Recording</button>
     </div>
-    <div class="right-div"></div>
+    <div class="right-div" id="chatBox">
+        <div class="loading-dots" id="loadingDots">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
 
     <script>
         let mediaRecorder;
@@ -74,22 +130,41 @@
                         const formData = new FormData();
                         formData.append('file', audioBlob, 'recording.wav');
 
+                        // Show loading dots animation
+                        document.getElementById('loadingDots').style.display = 'flex';
+
                         fetch('/upload', {
                             method: 'POST',
                             body: formData
                         })
                         .then(response => response.json())
                         .then(data => {
-                            if (data.output) {
-                                // Add a timestamp to avoid caching issues
-                                const timestamp = new Date().getTime();
-                                const audio = new Audio(`${data.output}?t=${timestamp}`);
-                                audio.play().catch(error => {
-                                    console.error('Error playing output audio:', error);
-                                });
+                            // Hide loading dots animation
+                            document.getElementById('loadingDots').style.display = 'none';
+
+                            if (data.message && data.response) {
+                                // Display user input and bot response in chatbox
+                                displayMessage(data.message, 'user');
+                                displayMessage(data.response, 'bot');
+
+                                // Play the response audio
+                                if (data.audio_url) {
+                                    const audio = new Audio(`${data.audio_url}?t=${new Date().getTime()}`);
+                                    audio.play().catch(error => {
+                                        console.error('Error playing output audio:', error);
+                                    });
+                                }
                             } else if (data.error) {
+                                if (data.error === 'No voice detected') {
+                                    displayMessage('No voice detected', 'bot');
+                                }
                                 console.error('Error:', data.error);
                             }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Hide loading dots animation in case of error
+                            document.getElementById('loadingDots').style.display = 'none';
                         });
                     };
                     mediaRecorder.start();
@@ -105,6 +180,18 @@
             document.getElementById('startBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
         };
+
+        // Function to display messages in the chatbox
+        function displayMessage(message, type) {
+            const chatBox = document.getElementById('chatBox');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add(type === 'user' ? 'user-message' : 'bot-message');
+            messageElement.textContent = message;
+            chatBox.appendChild(messageElement);
+
+            // Scroll to the bottom of the chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
     </script>
 </body>
 </html>

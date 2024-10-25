@@ -1,4 +1,4 @@
-# voice_assistant/transcription.py
+
 
 from deepgram import DeepgramClient, PrerecordedOptions, FileSource
 import json
@@ -46,4 +46,4 @@ def transcribe_audio(api_key, audio_file_path):
     except Exception as e:
         logging.error(f"Failed to transcribe audio: {e}")
         raise Exception("Error in transcribing audio")
-# print(transcribe_audio('fa514b70902b8a222eadfacf4920d2e0252be990',r'C:\Users\Sridhar\_EMPTY FOLDERS\ProJ_B3.O\uploads\recording.wav'))
+# print(transcribe_audio('ddbf32fde2fa328ab0f486c251de09ce1492be6d',r'C:\Users\Sridhar\_EMPTY FOLDERS\ProJ_B3.O\uploads\recording.wav'))

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPT Upload</title>
+</head>
+<body>
+   
+    {% comment %} <embed src="/static/Final Presentation.pdf" width="100%" height="600px" type="application/pdf"> {% endcomment %}
+    <h1>Upload a PowerPoint File</h1>
+    {% comment %} <img src="/static/pexels-andrejcook-131723.jpg" alt="yyjjyyy" width=900px height=900px> {% endcomment %}
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pptx" required>
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
