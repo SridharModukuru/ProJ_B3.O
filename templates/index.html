@@ -12,6 +12,7 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
+            background-color: #000; /* Default background */
         }
         .left-div {
             background-color: #f0f0f0;
@@ -19,7 +20,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end; /* Buttons at the bottom */
             padding: 20px;
             box-sizing: border-box;
         }
@@ -61,51 +62,61 @@
             border-radius: 10px;
             max-width: 80%;
         }
-        /* Loading dots animation */
-        .loading-dots {
-            display: none;
-            align-self: flex-end;
-            margin-top: 10px;
-            color: white;
+
+        /* Overlay Layer for Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8); /* Dark overlay background */
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: flex-end; /* Positioned near the bottom */
+            z-index: 9999; /* On top of everything */
         }
-        .loading-dots span {
-            display: inline-block;
+
+        /* Lottie Animation Styling */
+        .loading-animation {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 5%; /* Position slightly above the very bottom */
+        }
+
+        /* Stylish Scrollbar */
+        .right-div::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
-            background-color: white;
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: bounce 0.6s infinite alternate;
         }
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
+        .right-div::-webkit-scrollbar-thumb {
+            background-color: #666;
+            border-radius: 10px;
         }
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes bounce {
-            to {
-                transform: translateY(-10px);
-            }
+        .right-div::-webkit-scrollbar-track {
+            background-color: #111;
         }
     </style>
 </head>
 <body>
     <div class="left-div">
-        <button id="intro">_step1_ Start Chat</button>
-        <button id="startBtn">_step2_ Start Recording</button>
-        <button id="stopBtn" disabled>_step3_ Stop Recording</button>
+        <button id="intro">Start Chat</button>
+        <button id="startBtn">Start Recording</button>
+        <button id="stopBtn" disabled>Stop Recording</button>
     </div>
-    <div class="right-div" id="chatBox">
-        <div class="loading-dots" id="loadingDots">
-            <span></span><span></span><span></span>
-        </div>
+    
+    <div class="right-div" id="chatBox"></div>
+
+    <!-- Overlay container for animation -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-animation" id="lottieAnimation"></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
     <script>
         let mediaRecorder;
         let audioChunks = [];
 
+        // Play the introduction audio
         document.getElementById('intro').onclick = () => {
             const audio = new Audio('/static/intro.wav');
             audio.play().catch(error => {
@@ -113,6 +124,7 @@
             });
         };
 
+        // Start recording audio
         document.getElementById('startBtn').onclick = () => {
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
@@ -130,17 +142,17 @@
                         const formData = new FormData();
                         formData.append('file', audioBlob, 'recording.wav');
 
-                        // Show loading dots animation
-                        document.getElementById('loadingDots').style.display = 'flex';
+                        // Show loading overlay and animation
+                        document.getElementById('loadingOverlay').style.display = 'flex';
 
-                        fetch('/upload', {
+                        fetch('/chat/upload', {
                             method: 'POST',
                             body: formData
                         })
                         .then(response => response.json())
                         .then(data => {
-                            // Hide loading dots animation
-                            document.getElementById('loadingDots').style.display = 'none';
+                            // Hide loading animation and overlay
+                            document.getElementById('loadingOverlay').style.display = 'none';
 
                             if (data.message && data.response) {
                                 // Display user input and bot response in chatbox
@@ -163,8 +175,8 @@
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            // Hide loading dots animation in case of error
-                            document.getElementById('loadingDots').style.display = 'none';
+                            // Hide loading animation and overlay in case of error
+                            document.getElementById('loadingOverlay').style.display = 'none';
                         });
                     };
                     mediaRecorder.start();
@@ -173,6 +185,7 @@
                 });
         };
 
+        // Stop recording and process audio
         document.getElementById('stopBtn').onclick = () => {
             if (mediaRecorder) {
                 mediaRecorder.stop();
@@ -192,6 +205,15 @@
             // Scroll to the bottom of the chat box
             chatBox.scrollTop = chatBox.scrollHeight;
         }
+
+        // Initialize Lottie animation
+        var animation = lottie.loadAnimation({
+            container: document.getElementById('lottieAnimation'), // The container for the animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'static/Animation - 1730055711791.json' // Path to the JSON animation file
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Communication Platform</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/home2.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .navbar1 {
+            background-color: #222;
+        }
+        .acc-button, .login-button {
+            background: #6f42c1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            transition: background 0.3s ease;
+        }
+        .acc-button:hover, .login-button:hover {
+            background: #563d7c;
+        }
+        .hero-section {
+            background-color: #282828;
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+        }
+        .hero-btn {
+            background-color: #17a2b8;
+            border: none;
+            padding: 12px 24px;
+            color: #fff;
+            font-size: 18px;
+            transition: background 0.3s ease;
+        }
+        .hero-btn:hover {
+            background-color: #138496;
+        }
+        .features-section {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .features-section h2 {
+            margin-bottom: 40px;
+            font-size: 36px;
+        }
+        .feature-box {
+            background-color: #333;
+            padding: 40px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .feature-box:hover {
+            transform: translateY(-10px);
+        }
+        .feature-btn {
+            color: #17a2b8;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .feature-btn:hover {
+            color: #138496;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background-color: #222;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar1">
+        <a class="navbar-brand" href="#"><img src="logo.jpeg" class="navbar-img2" alt="Logo"/></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav mr-auto">
+                <a class="nav-link active" href="#">Home</a>
+                <a class="nav-link" href="#features">Features</a>
+                <a class="nav-link" href="#">Resources</a>
+                <a class="nav-link" href="#">Profile</a>
+                <a class="nav-link" href="#followus">Follow Us</a>
+            </div>
+            <div class="navbar-nav ml-auto">
+                <a class="nav-link" href="#"><button class="acc-button">Create Account</button></a>
+                <a class="nav-link" href="#"><button class="login-button">Login</button></a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Master English Communication with AI</h1>
+            <p>Join group discussions, participate in debates, and practice one-on-one conversations with AI-driven feedback.</p>
+            <button class="hero-btn" onclick="scrollToFeatures()">Explore Features</button>
+        </div>
+    </section>
+
+    <section id="features" class="features-section">
+        <h2>Platform Features</h2>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-box">
+                        <h3>Group Discussions</h3>
+                        <p>Join AI-moderated group discussions to enhance your communication skills.</p>
+                        <a href="/group" class="feature-btn">Join Discussion</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-box">
+                        <h3>1:1 Conversations</h3>
+                        <p>Practice one-on-one conversations with AI or other users in real-time.</p>
+                        <a href="/chat" class="feature-btn">Start Conversation</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-box">
+                        <h3>Chat</h3>
+                        <p>Communicate through chat and get instant feedback on your conversations.</p>
+                        <a href="#" class="feature-btn">Start Chat</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="followus">
+        <p>&copy; 2024 AI Communication Platform | Designed with 💡 by our Team</p>
+    </footer>
+
+    <script>
+        function scrollToFeatures() {
+            document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>

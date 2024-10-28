@@ -3,15 +3,9 @@
 from groq import Groq
 import logging
 
-chat_history = [
-    {"role": "system", "content": """ You are a helpful Assistant called Verbi. 
-        You are friendly and fun and you will help the users with their requests.
-        Your answers are short and concise. """}
-]
-
 api_key = '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'
 
-def generate_response(api_key, chat_history):
+def generate_response___(api_key, chat_history):
     """
     Generate a response using Groq.
     
