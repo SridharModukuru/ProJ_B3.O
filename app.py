@@ -18,7 +18,7 @@ chat_history = [
      Steeve: My opinion is to plant trees...
 
      end this here, just one chance for each.
-     most importantly everyone must definitely respond.
+     most importantly everyone must definitely
      now the topic is:{}
 """}
 ]
@@ -162,16 +162,24 @@ async def upload_file():
         'audio_url': f'/static/output.wav'
     }), 200
 
-# _____________________  from here_________:slide.py
+
+
+# =========================================================================================================================
+
+
+
+
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import redirect, url_for
 from werkzeug.utils import secure_filename
 from components.extract_images import extract_text_and_images_from_pptx
 from components.generate_content import process_images
 
+
 UPLOAD_FOLDER__ = 'uploaded_files'
 IMAGE_FOLDER__ = 'slide_images'
 ALLOWED_EXTENSIONS = {'pptx'}
+
 
 # app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER__
@@ -179,21 +187,21 @@ app.config['IMAGE_FOLDER'] = IMAGE_FOLDER__
 app.config['API_KEY'] = "AIzaSyC88AWwQQiL8_ZYWkmfIut5MnxkfiOYqt4"
 app.config['MODEL_NAME'] = "gemini-1.5-flash"
 
-# Ensure upload and image directories exist
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['IMAGE_FOLDER'], exist_ok=True)
+
+os.makedirs(UPLOAD_FOLDER__, exist_ok=True)
+os.makedirs(IMAGE_FOLDER__, exist_ok=True)
 
 def allowed_file(filename):
-    """Check if the file has a valid extension"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/slide')
-def index_():
+def indexes():
     return render_template('slide_index.html')
+
 @app.route('/slide/upload', methods=['POST'])
-def upload_slide_file():
+def upload_file_():
     if 'file' not in request.files:
-        return redirect(url_for('index_'))
+        return redirect(url_for('indexes'))
 
     file = request.files['file']
     
@@ -206,38 +214,39 @@ def upload_slide_file():
         extracted_data = extract_text_and_images_from_pptx(file_path, app.config['IMAGE_FOLDER'])
 
         # Prepare the prompt for the Gemini model
-        prompt_template = """You are a smart AI assistant generating elaborate content for giving a presentation based on the images and text present in the slide.
-            Elaborate the content of the slide in a specific manner.
-            For example, if the text in the slide is: Rose, Hibiscus, Lily and the images are of these flowers, you should explain like:
-            1. This beautiful flower: Rose, is red in color and the most beautiful flower.
-            2. The next one, Hibiscus, is ...
-            Relate the images and text and form a continuous flow of the presentation.
-            No need for introduction unless the text asks for it.
-            Now, the text is: {text}
+        prompt_template = """You are smart ai assistant that generates the elobarates content for giving a presentation by providing images and the text present in the slide,
+            elobarate the content of the slide in such a way that it is in a specific manner.
+            for example: if the text in the slide is: Rose Hibiscus Lily and the images are of these flowers, you should explain like
+            1.take a this beautiful flower: Rose, it is red in color and the most beautiful flower.
+            2.and the next one is hibisus is ....
+            3...   in this way you how to think about the pictures and text, relate them and form a continuous flow of presentation.
+            no need of introduction as you are in the middle of presentation unless the text is asking for it.
+            Give the responce in continuous normal text without any effects, as new line or special characters might result in ** and /n 
+            now the text is : {text}
         """
          
         results = []
         count = 0
         for slide_data in extracted_data:
-            text = slide_data['text']
+            text=slide_data['text']
             count += 1
-
-            # Modify the prompt based on slide position
             if count == 1:
-                text = 'This is the first slide, start by wishing and introducing the topic and slowly get into the text: ' + text
+                text = 'This is first slide, start by wishing and introducing the topic and slowly get into this text:'+text
             if count == len(extracted_data):
-                text = 'Finally, ' + text + ' thank you.'
+                text = 'Finally'+text+'thank you.'
 
             prompt = prompt_template.format(text=text)
             images_folder = slide_data['images']
-            
-            # Process images and get the response
             slide_results = process_images(app.config['API_KEY'], app.config['MODEL_NAME'], images_folder, prompt)
+            print("==========================================================================")
+            print(slide_results)
+            print("==========================================================================")
             results.append(slide_results)
         
         return render_template('result.html', results=results)
 
-    return redirect(url_for('index_'))
+    return redirect(url_for('indexes'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

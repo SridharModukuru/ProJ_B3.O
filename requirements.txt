@@ -5,3 +5,7 @@ Pillow
 google-generativeai
 groq
 deepgram
+
+
+
+

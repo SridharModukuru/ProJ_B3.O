@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slide Results Carousel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"> <!-- Import Poppins font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            font-family: 'Poppins', sans-serif; /* Apply Poppins font */
-            color: white; /* White text color for better visibility */
-            overflow: hidden; /* Prevent scrollbars */
-            position: relative; /* Position relative for the video */
-            height: 100vh; /* Full viewport height */
-            margin: 0; /* Remove default margin */
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            margin: 0;
         }
+        /* Video background */
         video {
             position: absolute;
             top: 50%;
@@ -23,55 +24,52 @@
             min-height: 100%;
             width: auto;
             height: auto;
-            z-index: -1; /* Behind the content */
+            z-index: -1;
             transform: translate(-50%, -50%);
-            filter: brightness(0.5); /* Darken the video */
+            filter: brightness(0.5);
         }
         .carousel-item {
-            height: 60vh; /* Set height for carousel items */
-            position: relative; /* Relative positioning for child elements */
+            height: 60vh;
+            position: relative;
         }
         .slide-content {
-            color: white; /* Change text color for visibility */
+            color: white;
             position: absolute;
-            bottom: 20px; /* Position text at the bottom */
+            bottom: 20px;
             left: 20px;
-            width: calc(100% - 40px); /* Full width minus padding */
-            min-height: 40%; /* Minimum height for the text div */
-            max-height: 70%; /* Maximum height for the text div */
-            overflow-y: auto; /* Enable vertical scrolling */
-            background: rgba(0, 0, 0, 0.6); /* Increase transparency for better visibility */
-            backdrop-filter: blur(15px); /* Glass effect */
+            width: calc(100% - 40px);
+            min-height: 40%;
+            max-height: 70%;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
             padding: 10px;
             border-radius: 5px;
         }
-
-        /* Stylish scrollbar */
         ::-webkit-scrollbar {
-            width: 12px; /* Width of the scrollbar */
+            width: 12px;
         }
-
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.7); /* Color of the scroll thumb */
-            border-radius: 10px; /* Rounded corners */
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
         }
-
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.2); /* Color of the track */
-            border-radius: 10px; /* Rounded corners */
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
+    <!-- Video Background -->
     <video autoplay muted loop>
-        <source src="static/5453622-uhd_3840_2160_24fps.mp4" type="video/mp4">
+        <source src="{{ url_for('static', filename='5453622-uhd_3840_2160_24fps.mp4') }}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
     <h1 class="text-center my-4">Generated Content for Each Slide</h1>
 
-    <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel" data-interval="3000"> <!-- Automatically changes every 3 seconds -->
+    <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel" data-interval="3000">
         <div class="carousel-inner">
             {% for slide_result in results %}
                 <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
@@ -88,12 +86,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        // Keyboard navigation
         document.addEventListener('keydown', function(event) {
             if (event.key === "ArrowRight") {
-                $('#carouselExampleSlidesOnly').carousel('next'); // Move to next slide
+                $('#carouselExampleSlidesOnly').carousel('next');
             } else if (event.key === "ArrowLeft") {
-                $('#carouselExampleSlidesOnly').carousel('prev'); // Move to previous slide
+                $('#carouselExampleSlidesOnly').carousel('prev');
             }
         });
     </script>
